@@ -18,11 +18,29 @@ clock = pygame.time.Clock()
 random.seed(pygame.time.get_ticks())
 
 # Graphics setup
-bg = pygame.transform.scale(pygame.image.load('assets\\slc-night.jpg'), (640, 480))
+#bg = pygame.transform.scale(pygame.image.load('assets\\slc-night.jpg'), (640, 480))
+bg = pygame.transform.scale(pygame.image.load('assets\\images\\village 2.png'), (640, 480))
 hero = Hero()
 fireball = Fireball(hero.rect.left + hero.rect.width - 35, hero.rect.top + 5)
 monsters = pygame.sprite.Group()
-hudfont = pygame.font.Font(None, 50)
+fodder = pygame.sprite.Group()
+font_hud = pygame.font.Font(None, 50)
+#font_gameover = pygame.font.Font("assets\\fonts\Spiders.ttf", 100)
+#font_gameover = pygame.font.Font("assets\\fonts\\vampiress.ttf", 100)
+font_gameover = pygame.font.Font("assets\\fonts\\Gingerbread House.ttf", 100)
+#font_gameover = pygame.font.Font("assets\\fonts\\Gypsy Curse.ttf", 100)
+#font_gameover = pygame.font.Font("assets\\fonts\\Zombie_Holocaust.ttf", 100)
+
+monster_frames = [
+    pygame.image.load("assets\\images\\jackolantern 0.png"),
+    pygame.image.load("assets\\images\\jackolantern 0.png"),
+    pygame.image.load("assets\\images\\jackolantern 0.png"),
+    pygame.image.load("assets\\images\\jackolantern 0.png")
+]
+
+hero_frames = [
+    
+]
 
 
 # Game metrics setup
@@ -43,10 +61,14 @@ initial_monster_frequency = monster_frequency
 # Sound setup
 snd_fire = pygame.mixer.Sound('assets\\sounds\\fire.wav')
 snd_1up = pygame.mixer.Sound('assets\\sounds\\1up.wav')
-snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\hero-hit.wav')
+#snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\hero-hit.wav')
+snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\melting.wav')
 snd_hero_hit.set_volume(0.2)
 snd_monster_hit = pygame.mixer.Sound('assets\\sounds\\monster-hit.wav')
 snd_monster_hit.set_volume(0.2)
+snd_game_over = pygame.mixer.Sound('assets\\sounds\\what a world.wav')
+snd_splatter = pygame.mixer.Sound('assets\\sounds\\splatter.wav')
+
 snd_background = pygame.mixer.Sound('assets\\sounds\\background.wav')
 snd_background.set_volume(0.2)
 
@@ -54,20 +76,34 @@ snd_background.play(-1)
 
 
 def show_hud(current_score, current_lives):
-    scoretext = hudfont.render('Score: ' + str(current_score), 1, [255, 255, 255])
-    livestext = hudfont.render('Lives: ' + str(current_lives), 1, [255, 255, 255])
+    scoretext = font_hud.render('Score: ' + str(current_score), 1, [255, 255, 255])
+    livestext = font_hud.render('Lives: ' + str(current_lives), 1, [255, 255, 255])
     pygame.draw.rect(screen, [0, 0, 0], pygame.Rect(0, 449, 639, 479))
     screen.blit(livestext, pygame.Rect(0, 449, 320, 479))
     screen.blit(scoretext, pygame.Rect(320, 449, 639, 478))
 
+def silence_all():
+    snd_1up.stop()
+    snd_fire.stop()
+    snd_hero_hit.stop()
+    snd_monster_hit.stop()
+    snd_game_over.stop()
+
 def game_over():
-        snd_background.stop()
-        screen.fill([255, 0, 0])
-        gameover_font = pygame.font.Font(None, 100)
-        gameover_text = gameover_font.render('GAME OVER', True, [0, 0, 0])
-        screen.blit(gameover_text, ((640 - gameover_text.get_rect().width)/ 2, (480 - gameover_text.get_rect().height) /2))
-        show_hud(score, lives)
-        pygame.display.update()
+    snd_background.stop()
+    screen.fill([255, 128, 0])
+    #gameover_font = pygame.font.Font(None, 100)
+    #gameover_text = gameover_font.render('GAME OVER', True, [0, 0, 0])
+    gameover_text = font_gameover.render('GAME OVER', True, [0, 0, 0])
+    screen.blit(gameover_text, ((640 - gameover_text.get_rect().width)/ 2, (480 - gameover_text.get_rect().height) /2))
+    show_hud(score, lives)
+    pygame.display.update()
+
+def explode_monsters(monsters):
+    pass
+
+# TODO: Remove this.  It takes us to the game-over screen, which was convenient when working on the game-over screen.
+#lives = 0
 
 # Main game loop
 while True:
@@ -75,7 +111,7 @@ while True:
     # Look for messages that the game sends to us
     for event in pygame.event.get():
         # User clicked the [X] to quit.  
-        if event.type == pygame.QUIT:
+        if ( event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == K_ESCAPE):
             pygame.mixer.quit()
             sys.exit()
 
@@ -103,7 +139,6 @@ while True:
             amplitude = 100
         monsters.add(Monster( (640, random.randint(0, 300)), [0], create_sinewave_diff(math.trunc(640.0 / 8), amplitude)))
         last_monster_time = pygame.time.get_ticks()
-        
 
     # Move objects around
     if btn_uparrow:
@@ -136,8 +171,10 @@ while True:
     for m in monsters:
         if m.rect.left < -200:
             monsters.remove(m)
-            
 
+    # Move fodder
+    for f in fodder:
+        pass
 
     # Look for collisions between the fireball and the monsters
     if (fired):
@@ -152,14 +189,18 @@ while True:
             monster_speed = initial_monster_speed + (score / 100.0)
             monsters_per_second = initial_monsters_per_second + (score / 100.0)
             monster_frequency = 1000.0 / monsters_per_second
-            # TODO: Play a sound
+            # Play a sound.
             snd_monster_hit.play()
+        explode_monsters(collisions)
     
     # Look for collisions between the hero and the monsters
     collisions = pygame.sprite.spritecollide(hero, monsters, True)
     if (len(collisions) > 0):
         lives = lives - 1
         snd_hero_hit.play()
+        if (lives == 0):
+            silence_all()
+            snd_game_over.play()
 
             
     # Draw the background

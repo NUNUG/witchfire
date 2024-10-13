@@ -18,18 +18,26 @@ class MovingSprite(pygame.sprite.Sprite):
 
 class AnimatedSprite(MovingSprite):
     """This is a sprite with two frames.
-        He also keeps track of where he is on the screen."""
-    def __init__(self, target_size, initial_position, imagefilename1, imagefilename2):
+        She also keeps track of where she is on the screen."""
+    def __init__(self, target_size, initial_position, list_of_image_files):
         MovingSprite.__init__(self, initial_position)
         # Set up 2 images for animation and use the first one for now.
-        self._image1 = pygame.transform.scale(pygame.image.load(imagefilename1), target_size)
-        self._image2 = pygame.transform.scale(pygame.image.load(imagefilename2), target_size)
-        self._images = [self._image1, self._image2]
+        #self._image1 = pygame.transform.scale(pygame.image.load(imagefilename1), target_size)
+        #self._image2 = pygame.transform.scale(pygame.image.load(imagefilename2), target_size)
+        self._images = self.load_images(target_size, list_of_image_files)
+        #self._images = [self._image1, self._image2]
+        self._image_count = len(self._images)
         self._image_index = 0
         self._animate_marker = pygame.time.get_ticks()
         self.image = self._images[self._image_index]
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = initial_position
+    def load_images(self, target_size, list_of_image_files):
+        result = []
+        for filename in list_of_image_files:
+            loaded_image = pygame.transform.scale(pygame.image.load(filename), target_size)
+            result.append(loaded_image)
+        return result
     def animate(self):
         """Switches between images to create animation."""
         # Check to see if we've used this image long enough.
@@ -39,27 +47,27 @@ class AnimatedSprite(MovingSprite):
         if milliseconds_since_last_animation > milliseconds_per_frame:
             # Move to the other image and reset the timer.
             self._animate_marker = pygame.time.get_ticks()
-            self._image_index = (self._image_index + 1) % 2
+            self._image_index = (self._image_index + 1) % self._image_count
             self.image = self._images[self._image_index]
             #self.rect = self.image.get_rect()
 
 class Hero(AnimatedSprite):
-    """This is our hero.  He has two images so we can animate him.
-        He also keeps track of where he is on the screen."""
+    """This is our witch.  She has two images so we can animate her.
+        She also keeps track of where she is on the screen."""
     def __init__(self):
-        AnimatedSprite.__init__(self, (150, 30), (0, 200), 'assets\\hero1.png', 'assets\\hero2.png')
+        AnimatedSprite.__init__(self, (150, 30), (0, 200), ['assets\\images\\hero1.png', 'assets\\images\\hero2.png'])
 
     
 class Fireball(AnimatedSprite):
     """This is the "bullet" fired by our hero."""
     def __init__(self, xpos, ypos):
-        AnimatedSprite.__init__(self, (35, 20), (xpos, ypos), 'assets\\fireball1.png', 'assets\\fireball2.png')
+        AnimatedSprite.__init__(self, (35, 20), (xpos, ypos), ['assets\\images\\fireball1.png', 'assets\\images\\fireball2.png'])
 
 class Monster(MovingSprite):
     """This is a monster which knows how to move in evasive ways."""
     def __init__(self, initial_position, x_movement_path, y_movement_path):
         MovingSprite.__init__(self, initial_position)
-        self.image = pygame.transform.scale(pygame.image.load('assets\\monster1.png'), (100, 75))
+        self.image = pygame.transform.scale(pygame.image.load('assets\\images\\monster1.png'), (100, 75))
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = (initial_position)
         self.x_path = x_movement_path
