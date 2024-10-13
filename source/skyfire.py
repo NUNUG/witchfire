@@ -26,6 +26,8 @@ monsters = pygame.sprite.Group()
 fodder = pygame.sprite.Group()
 font_hud = pygame.font.Font(None, 50)
 font_gameover = pygame.font.Font("assets\\fonts\\Gingerbread House.ttf", 100)
+pumpkin_bit_images = PumpkinBitImages().images
+pumpkin_bits_list = []
 
 # Game metrics setup
 hero_speed = 5.0
@@ -45,6 +47,7 @@ initial_monster_frequency = monster_frequency
 # Sound setup
 snd_fire = pygame.mixer.Sound('assets\\sounds\\fire.wav')
 snd_1up = pygame.mixer.Sound('assets\\sounds\\1up.wav')
+snd_konami = pygame.mixer.Sound('assets\\sounds\\konami-logo-snes.wav')
 snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\melting.wav')
 snd_hero_hit.set_volume(0.2)
 snd_monster_hit = pygame.mixer.Sound('assets\\sounds\\splatter.wav')
@@ -82,14 +85,19 @@ def game_over():
     show_hud(score, lives)
     pygame.display.update()
 
-def explode_monsters(monsters):
+def explode_monsters(monsters, bits_list):
+    # For each of these monsters, create the bits.
+    # Add the bits to the bits list.
+    for m in monsters:
+        for n in range(5):
+            pumpkin_bit = PumpkinBit(m.position, random, pumpkin_bit_images[n])
+            bits_list.append(pumpkin_bit)
     pass
 
 def konami_kode_func():
-    print("Konami Kode invoked.")
     global lives
     lives += 30
-    snd_1up.play()
+    snd_konami.play()
 
 konami_kode = KonamiKode(konami_kode_func)
 
@@ -189,7 +197,7 @@ while True:
             monster_frequency = 1000.0 / monsters_per_second
             # Play a sound.
             snd_monster_hit.play()
-        explode_monsters(collisions)
+        explode_monsters(collisions, pumpkin_bits_list)
     
     # Look for collisions between the hero and the monsters
     collisions = pygame.sprite.spritecollide(hero, monsters, True)
@@ -217,6 +225,13 @@ while True:
     for m in monsters:
         m.animate()
         screen.blit(m.image, m.rect)
+
+    # Draw the pumpkin bits
+    for b in pumpkin_bits_list:
+        b.move()
+        if b.position[1] > 700:
+            pumpkin_bits_list.remove(b)
+        screen.blit(pygame.transform.scale(pygame.transform.rotate(b.image, b.angle), (b.rect.width * b.scale, b.rect.height * b.scale)), Rect(b.rect.left, b.rect.top, b.rect.width, b.rect.height))
 
     # Draw the HUD
     show_hud(score, lives)

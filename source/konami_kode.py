@@ -50,9 +50,6 @@ class KonamiKode:
 			self._last_space = False
 
 	def capture_down(self, keyboard_kode):
-		#print("Last9: ", self._last9)
-		#print("konkd: ", self.the_konami_kode)
-		#print("")
 		if (keyboard_kode == K_UP and (not self._last_up)):
 			self._last9.append(K_UP)
 			self.clear_previous_states()
@@ -78,6 +75,5 @@ class KonamiKode:
 			self._last9 = self._last9[-9:]
 
 		if (self._last9 == self.the_konami_kode):
-			print("Konami Kode Detected!")
 			self._konami_kode_func()
 			self._last9 = []

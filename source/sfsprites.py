@@ -97,6 +97,48 @@ class Monster(AnimatedSprite):
         self.x_path_index = (self.x_path_index + 1) % self.x_path_len
         self.y_path_index = (self.y_path_index + 1) % self.y_path_len
 
+class PumpkinBitImages:
+    def __init__(self):
+        self._target_size = (50, 50)
+        self.images = [
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-0.png"), (self._target_size[0] * 2, self._target_size[1] * 2)),
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-1.png"), self._target_size),
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-2.png"), self._target_size),
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-3.png"), self._target_size),
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-4.png"), self._target_size),
+            pygame.transform.scale(pygame.image.load("assets\\images\\pumpkin-bits-5.png"), self._target_size)
+        ]
+
+class PumpkinBit(pygame.sprite.Sprite):
+    """This is a piece of a pumpkin which has been blown up.  It will fly in a random direction, 
+    but then be influenced backward by its impact with the fireball and ascend downward according to gravity."""
+    def __init__(self, initial_position, rando, image):
+        self.position = initial_position
+        self.default_speed = 1.0
+        self.gravity = 0.098
+        self.explosion_x_velocity = 1.0 * rando.randint(-1000, 1000) * 0.001 * self.default_speed * 1.0
+        self.explosion_y_velocity = 1.0 * rando.randint(-1000, 1000) * 0.001 * self.default_speed * 1.0
+        self.explosion_velocity = (self.explosion_x_velocity, self.explosion_y_velocity)
+        self.impact_inertia = 2.75
+        self.velocity = (self.explosion_velocity[0] + self.impact_inertia, self.explosion_velocity[1] * 1.0)
+        self.angle = rando.randint(0, 359)
+        self.angular_velocity = rando.randint(-1000, 1000) * 0.001 * 5.0
+        self.image = image
+        self.scale = 0.75
+        self.rect = image.get_rect()
+    def _rotate(self):
+        self.angle = self.angle + self.angular_velocity
+    def _apply_physics(self):
+        self.velocity = (self.velocity[0] * 1.0, self.velocity[1] +  self.gravity)
+        self.position = (self.position[0] + self.velocity[0], self.position[1] + self.velocity[1])
+        self.rect.left = self.position[0]
+        self.rect.top = self.position[1]
+    def move(self):
+        self._rotate()
+        self._apply_physics()
+
+
+
 def create_sinewave(increments):
     result = []
     for j in range(increments):
