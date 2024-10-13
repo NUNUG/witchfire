@@ -1,6 +1,9 @@
 # WitchFire
 A Halloween enhanced version of the SkyFire shooter game, which was written and presented by Phil Gilmore at Utah Kids Code Camp 2017 (github.com/nunug/kcc_2017).
 
+## Screen Shot
+![WitchFire Screen Shot](witchfire_screen_shot.png "WitchFire Screen Shot")
+
 ## How to Run
 _Note! 
 The program is not tested on Mac or Linux.  You may need to change file path references to use different slashes._
