@@ -137,8 +137,6 @@ class PumpkinBit(pygame.sprite.Sprite):
         self._rotate()
         self._apply_physics()
 
-
-
 def create_sinewave(increments):
     result = []
     for j in range(increments):
