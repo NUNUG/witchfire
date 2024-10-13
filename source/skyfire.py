@@ -4,8 +4,7 @@ import sys
 import random
 import math
 from sfsprites import *
-
-
+from konami_kode import KonamiKode
 
 # Pygame Setup
 pygame.mixer.pre_init(22050, -16, 2, 256)
@@ -25,23 +24,7 @@ fireball = Fireball(hero.rect.left + hero.rect.width - 35, hero.rect.top + 5)
 monsters = pygame.sprite.Group()
 fodder = pygame.sprite.Group()
 font_hud = pygame.font.Font(None, 50)
-#font_gameover = pygame.font.Font("assets\\fonts\Spiders.ttf", 100)
-#font_gameover = pygame.font.Font("assets\\fonts\\vampiress.ttf", 100)
 font_gameover = pygame.font.Font("assets\\fonts\\Gingerbread House.ttf", 100)
-#font_gameover = pygame.font.Font("assets\\fonts\\Gypsy Curse.ttf", 100)
-#font_gameover = pygame.font.Font("assets\\fonts\\Zombie_Holocaust.ttf", 100)
-
-#monster_frames = [
-#    pygame.image.load("assets\\images\\jackolantern 0.png"),
-#    pygame.image.load("assets\\images\\jackolantern 0.png"),
-#    pygame.image.load("assets\\images\\jackolantern 0.png"),
-#    pygame.image.load("assets\\images\\jackolantern 0.png")
-#]
-
-hero_frames = [
-    
-]
-
 
 # Game metrics setup
 hero_speed = 5.0
@@ -61,10 +44,9 @@ initial_monster_frequency = monster_frequency
 # Sound setup
 snd_fire = pygame.mixer.Sound('assets\\sounds\\fire.wav')
 snd_1up = pygame.mixer.Sound('assets\\sounds\\1up.wav')
-#snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\hero-hit.wav')
 snd_hero_hit = pygame.mixer.Sound('assets\\sounds\\melting.wav')
 snd_hero_hit.set_volume(0.2)
-snd_monster_hit = pygame.mixer.Sound('assets\\sounds\\monster-hit.wav')
+snd_monster_hit = pygame.mixer.Sound('assets\\sounds\\splatter.wav')
 snd_monster_hit.set_volume(0.2)
 snd_game_over = pygame.mixer.Sound('assets\\sounds\\what a world.wav')
 snd_splatter = pygame.mixer.Sound('assets\\sounds\\splatter.wav')
@@ -74,7 +56,6 @@ snd_background = pygame.mixer.Sound('assets\\sounds\\background.wav')
 snd_background.set_volume(0.2)
 
 snd_background.play(-1)
-
 
 def show_hud(current_score, current_lives):
     scoretext = font_hud.render('Score: ' + str(current_score), 1, [255, 255, 255])
@@ -103,13 +84,22 @@ def game_over():
 def explode_monsters(monsters):
     pass
 
-# TODO: Remove this.  It takes us to the game-over screen, which was convenient when working on the game-over screen.
-#lives = 0
+def konami_kode_func():
+    print("Konami Kode invoked.")
+    global lives
+    lives += 30
+    snd_1up.play()
+
+konami_kode = KonamiKode(konami_kode_func)
 
 snd_startup.play()
 
+# TODO: Remove this.  It takes us to the game-over screen, which was convenient when working on the game-over screen.
+#lives = 0
+
 # Main game loop
 while True:
+
     clock.tick(100)
     # Look for messages that the game sends to us
     for event in pygame.event.get():
@@ -124,7 +114,7 @@ while True:
         game_over()
         continue
 
-    
+    # Read keyboard
     if pygame.key.get_focused():
         keystates = pygame.key.get_pressed()
 
@@ -134,6 +124,9 @@ while True:
         
         # Look for FIRE button (spacebar)
         btn_space = keystates[K_SPACE]
+
+        # Look for Konami code.
+        konami_kode.capture(keystates)
 
     # Create new monsters if needed
     if (pygame.time.get_ticks() - last_monster_time > monster_frequency):
@@ -220,6 +213,7 @@ while True:
 
     # Draw the monsters
     for m in monsters:
+        m.animate()
         screen.blit(m.image, m.rect)
 
     # Draw the HUD

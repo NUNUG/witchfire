@@ -63,11 +63,17 @@ class Fireball(AnimatedSprite):
     def __init__(self, xpos, ypos):
         AnimatedSprite.__init__(self, (35, 20), (xpos, ypos), ['assets\\images\\fireball1.png', 'assets\\images\\fireball2.png'])
 
-class Monster(MovingSprite):
+class Monster(AnimatedSprite):
     """This is a monster which knows how to move in evasive ways."""
     def __init__(self, initial_position, x_movement_path, y_movement_path):
-        MovingSprite.__init__(self, initial_position)
-        self.image = pygame.transform.scale(pygame.image.load('assets\\images\\monster1.png'), (100, 75))
+        AnimatedSprite.__init__(self, (100, 75), initial_position, [
+            'assets\\images\\jackolantern-0.png',
+            'assets\\images\\jackolantern-1.png',
+            'assets\\images\\jackolantern-2.png',
+            'assets\\images\\jackolantern-3.png'
+        ])
+        #MovingSprite.__init__(self, initial_position)
+        #self.image = pygame.transform.scale(pygame.image.load('assets\\images\\monster1.png'), (100, 75))
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = (initial_position)
         self.x_path = x_movement_path
