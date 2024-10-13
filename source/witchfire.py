@@ -3,7 +3,7 @@ from pygame.locals import *
 import sys
 import random
 import math
-from sfsprites import *
+from wfsprites import *
 from konami_kode import KonamiKode
 
 # Pygame Setup
@@ -12,7 +12,14 @@ pygame.mixer.init()
 pygame.init()
 
 # SkyFire setup
-screen = pygame.display.set_mode([640, 480])
+screen_buffer_width = 640
+screen_buffer_height = 480
+screen_buffer_dimensions = [screen_buffer_width, screen_buffer_height]
+screen_width = 1920
+screen_height = 1080
+screen_dimensions = [screen_width, screen_height]
+screen_buffer = pygame.surface.Surface(screen_buffer_dimensions)
+screen = pygame.display.set_mode(screen_dimensions)
 clock = pygame.time.Clock()
 random.seed(pygame.time.get_ticks())
 
@@ -64,9 +71,9 @@ snd_background.play(-1)
 def show_hud(current_score, current_lives):
     scoretext = font_hud.render('Score: ' + str(current_score), 1, [255, 255, 255])
     livestext = font_hud.render('Lives: ' + str(current_lives), 1, [255, 255, 255])
-    pygame.draw.rect(screen, [0, 0, 0], pygame.Rect(0, 449, 639, 479))
-    screen.blit(livestext, pygame.Rect(0, 449, 320, 479))
-    screen.blit(scoretext, pygame.Rect(320, 449, 639, 478))
+    pygame.draw.rect(screen_buffer, [0, 0, 0], pygame.Rect(0, 449, 639, 479))
+    screen_buffer.blit(livestext, pygame.Rect(0, 449, 320, 479))
+    screen_buffer.blit(scoretext, pygame.Rect(320, 449, 639, 478))
 
 def silence_all():
     snd_1up.stop()
@@ -77,12 +84,12 @@ def silence_all():
 
 def game_over():
     snd_background.stop()
-    screen.fill([255, 128, 0])
-    #gameover_font = pygame.font.Font(None, 100)
-    #gameover_text = gameover_font.render('GAME OVER', True, [0, 0, 0])
+    screen_buffer.fill([255, 128, 0])
     gameover_text = font_gameover.render('GAME OVER', True, [0, 0, 0])
-    screen.blit(gameover_text, ((640 - gameover_text.get_rect().width)/ 2, (480 - gameover_text.get_rect().height) /2))
+    screen_buffer.blit(gameover_text, ((640 - gameover_text.get_rect().width)/ 2, (480 - gameover_text.get_rect().height) /2))
     show_hud(score, lives)
+    # Draw buffer to screen.
+    screen.blit(pygame.transform.scale(screen_buffer, (screen_width, screen_height)), (0,0))
     pygame.display.update()
 
 def explode_monsters(monsters, bits_list):
@@ -210,31 +217,34 @@ while True:
 
             
     # Draw the background
-    screen.blit(bg, [0,0])
+    screen_buffer.blit(bg, [0,0])
     
     # Draw the hero
     hero.animate()
-    screen.blit(hero.image, hero.rect)
+    screen_buffer.blit(hero.image, hero.rect)
 
     # Draw the fireball
     if fired:
         fireball.animate()
-        screen.blit(fireball.image, fireball.rect)
+        screen_buffer.blit(fireball.image, fireball.rect)
 
     # Draw the monsters
     for m in monsters:
         m.animate()
-        screen.blit(m.image, m.rect)
+        screen_buffer.blit(m.image, m.rect)
 
     # Draw the pumpkin bits
     for b in pumpkin_bits_list:
         b.move()
         if b.position[1] > 700:
             pumpkin_bits_list.remove(b)
-        screen.blit(pygame.transform.scale(pygame.transform.rotate(b.image, b.angle), (b.rect.width * b.scale, b.rect.height * b.scale)), Rect(b.rect.left, b.rect.top, b.rect.width, b.rect.height))
+        screen_buffer.blit(pygame.transform.scale(pygame.transform.rotate(b.image, b.angle), (b.rect.width * b.scale, b.rect.height * b.scale)), Rect(b.rect.left, b.rect.top, b.rect.width, b.rect.height))
 
     # Draw the HUD
     show_hud(score, lives)
 
-    # Draw the scene onto the monitor.
+    # Draw the buffer on to the screen.
+    screen.blit(pygame.transform.scale(screen_buffer, (screen_width, screen_height)), (0,0))
+
+    # Draw the screen on the monitor.
     pygame.display.update()
