@@ -31,12 +31,12 @@ font_gameover = pygame.font.Font("assets\\fonts\\Gingerbread House.ttf", 100)
 #font_gameover = pygame.font.Font("assets\\fonts\\Gypsy Curse.ttf", 100)
 #font_gameover = pygame.font.Font("assets\\fonts\\Zombie_Holocaust.ttf", 100)
 
-monster_frames = [
-    pygame.image.load("assets\\images\\jackolantern 0.png"),
-    pygame.image.load("assets\\images\\jackolantern 0.png"),
-    pygame.image.load("assets\\images\\jackolantern 0.png"),
-    pygame.image.load("assets\\images\\jackolantern 0.png")
-]
+#monster_frames = [
+#    pygame.image.load("assets\\images\\jackolantern 0.png"),
+#    pygame.image.load("assets\\images\\jackolantern 0.png"),
+#    pygame.image.load("assets\\images\\jackolantern 0.png"),
+#    pygame.image.load("assets\\images\\jackolantern 0.png")
+#]
 
 hero_frames = [
     
@@ -68,6 +68,7 @@ snd_monster_hit = pygame.mixer.Sound('assets\\sounds\\monster-hit.wav')
 snd_monster_hit.set_volume(0.2)
 snd_game_over = pygame.mixer.Sound('assets\\sounds\\what a world.wav')
 snd_splatter = pygame.mixer.Sound('assets\\sounds\\splatter.wav')
+snd_startup = pygame.mixer.Sound('assets\\sounds\\these things must be done delicately.wav')
 
 snd_background = pygame.mixer.Sound('assets\\sounds\\background.wav')
 snd_background.set_volume(0.2)
@@ -104,6 +105,8 @@ def explode_monsters(monsters):
 
 # TODO: Remove this.  It takes us to the game-over screen, which was convenient when working on the game-over screen.
 #lives = 0
+
+snd_startup.play()
 
 # Main game loop
 while True:

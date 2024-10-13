@@ -1,3 +1,6 @@
 __pycache__/
 *.zip
 old/
+source/assets/images/generated/
+source/assets/sounds/projects/
+source/assets/images/originals/
