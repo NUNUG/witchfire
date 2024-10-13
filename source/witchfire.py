@@ -110,9 +110,6 @@ konami_kode = KonamiKode(konami_kode_func)
 
 snd_startup.play()
 
-# TODO: Remove this.  It takes us to the game-over screen, which was convenient when working on the game-over screen.
-#lives = 0
-
 # Main game loop
 while True:
 
@@ -165,7 +162,6 @@ while True:
 
     if btn_space and (not fired):
         # Launch a fireball.
-        #fireball.position = (hero.rect.left + hero.rect.width - 35.0, hero.rect.top + 5.0)
         fireball.position = (hero.rect.left + hero.rect.width - 35.0, hero.rect.top + 45.0)
         snd_fire.play()
         fired = True
@@ -184,10 +180,6 @@ while True:
     for m in monsters:
         if m.rect.left < -200:
             monsters.remove(m)
-
-    # Move fodder
-    for f in fodder:
-        pass
 
     # Look for collisions between the fireball and the monsters
     if (fired):
