@@ -14,18 +14,14 @@ class MovingSprite(pygame.sprite.Sprite):
         self.position = (xval, yval)
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = self.position
-        
 
 class AnimatedSprite(MovingSprite):
     """This is a sprite with two frames.
         She also keeps track of where she is on the screen."""
     def __init__(self, target_size, initial_position, list_of_image_files):
         MovingSprite.__init__(self, initial_position)
-        # Set up 2 images for animation and use the first one for now.
-        #self._image1 = pygame.transform.scale(pygame.image.load(imagefilename1), target_size)
-        #self._image2 = pygame.transform.scale(pygame.image.load(imagefilename2), target_size)
+        # Set up multiple images for animation and use the first one for now.
         self._images = self.load_images(target_size, list_of_image_files)
-        #self._images = [self._image1, self._image2]
         self._image_count = len(self._images)
         self._image_index = 0
         self._animate_marker = pygame.time.get_ticks()
@@ -49,13 +45,18 @@ class AnimatedSprite(MovingSprite):
             self._animate_marker = pygame.time.get_ticks()
             self._image_index = (self._image_index + 1) % self._image_count
             self.image = self._images[self._image_index]
-            #self.rect = self.image.get_rect()
 
 class Hero(AnimatedSprite):
     """This is our witch.  She has two images so we can animate her.
         She also keeps track of where she is on the screen."""
     def __init__(self):
-        AnimatedSprite.__init__(self, (150, 30), (0, 200), ['assets\\images\\hero1.png', 'assets\\images\\hero2.png'])
+        #AnimatedSprite.__init__(self, (150, 30), (0, 200), ['assets\\images\\hero1.png', 'assets\\images\\hero2.png'])
+        AnimatedSprite.__init__(self, (150, 117), (0, 200), [
+            'assets\\images\\witch-1.png',
+            'assets\\images\\witch-2.png',
+            'assets\\images\\witch-3.png',
+            'assets\\images\\witch-4.png'
+        ])
 
     
 class Fireball(AnimatedSprite):
@@ -72,8 +73,6 @@ class Monster(AnimatedSprite):
             'assets\\images\\jackolantern-2.png',
             'assets\\images\\jackolantern-3.png'
         ])
-        #MovingSprite.__init__(self, initial_position)
-        #self.image = pygame.transform.scale(pygame.image.load('assets\\images\\monster1.png'), (100, 75))
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = (initial_position)
         self.x_path = x_movement_path
@@ -88,14 +87,8 @@ class Monster(AnimatedSprite):
         # Figure next value in the path
         xoffset = self.x_path[self.x_path_index]
         yoffset = self.y_path[self.y_path_index]
-        ## Move
-        #MovingSprite.move(self, xdistance + xoffset, ydistance + yoffset)
 
-        # This part is working and necessary.
-        #self.rect.left = self.rect.left + xdistance
-        #self.rect.top = self.rect.top + ydistance
-        #MovingSprite.move(self, xdistance + xoffset, ydistance + yoffset)
-        #posx, posy = ()
+        ## Move
         posx = xdistance + xoffset
         posy = ydistance + yoffset
         MovingSprite.move(self, posx, posy)
@@ -103,7 +96,6 @@ class Monster(AnimatedSprite):
         # Advance to the next path offset. Wrap around if we hit the end of xpath or ypath.
         self.x_path_index = (self.x_path_index + 1) % self.x_path_len
         self.y_path_index = (self.y_path_index + 1) % self.y_path_len
-
 
 def create_sinewave(increments):
     result = []

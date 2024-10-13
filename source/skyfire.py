@@ -20,7 +20,8 @@ random.seed(pygame.time.get_ticks())
 #bg = pygame.transform.scale(pygame.image.load('assets\\slc-night.jpg'), (640, 480))
 bg = pygame.transform.scale(pygame.image.load('assets\\images\\village 2.png'), (640, 480))
 hero = Hero()
-fireball = Fireball(hero.rect.left + hero.rect.width - 35, hero.rect.top + 5)
+#fireball = Fireball(hero.rect.left + hero.rect.width - 35, hero.rect.top + 5)
+fireball = Fireball(hero.rect.left + hero.rect.width - 35, hero.rect.top + 53)
 monsters = pygame.sprite.Group()
 fodder = pygame.sprite.Group()
 font_hud = pygame.font.Font(None, 50)
@@ -149,7 +150,8 @@ while True:
 
     if btn_space and (not fired):
         # Launch a fireball.
-        fireball.position = (hero.rect.left + hero.rect.width - 35.0, hero.rect.top + 5.0)
+        #fireball.position = (hero.rect.left + hero.rect.width - 35.0, hero.rect.top + 5.0)
+        fireball.position = (hero.rect.left + hero.rect.width - 35.0, hero.rect.top + 45.0)
         snd_fire.play()
         fired = True
 
